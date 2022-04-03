@@ -4,12 +4,46 @@ namespace App\Controllers;
 
 use App\Utils\Controller;
 use App\Utils\Response;
+use App\Utils\Request;
+use App\Utils\Database;
 
 class PhoneController extends Controller
 {
-    public static function getCountry($request)
-    {
+    public static $COUNTRY_CODES = [
+        '+7' => 'RU(Россия)',
+        '+1' => 'US(США)',
+        '+86' => 'CH(Китай)',
+        '+52' => 'MX(Максика)',
+        '+1905' => 'MX(Мексика)',
+    ];
 
-        Response::json($request->getBody());
+    public static function validatePhone(string $phone)
+    {
+        preg_match('/^\+?\d+$/', $phone, $matches);
+        return $matches;
+    }
+
+    public static function getCountry(Request $request)
+    {
+        $phone = $request->phone;
+
+        if (!$phone || !self::validatePhone($phone))
+            return Response::json([
+                'message' => 'Empty phone or wrong format'
+            ], 400);
+
+        $country = "RU(Россия)";
+        foreach (self::$COUNTRY_CODES as $code => $code_country)
+            if (str_starts_with($phone, $code))
+                $country = $code_country;
+
+        return Response::json([
+            'country' => $country
+        ]);
+    }
+
+    public static function search(Database $db, Request $request)
+    {
+        echo 123;
     }
 }

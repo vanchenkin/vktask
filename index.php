@@ -1,15 +1,14 @@
 <?php
-require 'vendor/autoload.php';
+require_once './bootstrap.php';
+require_once './routes.php';
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: GET,POST,PUT,DELETE");
+header("Access-Control-Allow-Methods: GET,POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->safeLoad();
-
+//обработка исключений через json
 set_exception_handler(function (Throwable $e) {
     http_response_code($e->getCode());
     $error_array = [
@@ -26,31 +25,30 @@ set_exception_handler(function (Throwable $e) {
             'file' => $e->getFile(),
             'line' => $e->getLine(),
         ];
-    echo json_encode($error_array);
+    echo json_encode($error_array, JSON_UNESCAPED_UNICODE);
 });
 
-$request = new App\Utils\Request($_SERVER["REQUEST_METHOD"], $_SERVER['REQUEST_URI']);
-$api_function = $request->getUri()[1];
-
-require 'routes.php';
-
+//вызов метода по пути
+$api_function = explode('/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH))[1];
+$routes = $_SERVER['REQUEST_METHOD'] == 'GET' ? $getRoutes : $postRoutes;
 if (array_key_exists($api_function, $routes)) {
-    $method = new ReflectionMethod($routes[$api_function][0], $routes[$api_function][1]);
+    $controller_method = new \ReflectionMethod($routes[$api_function][0], $routes[$api_function][1]);
 
-    $is_need_db = count(array_filter($method->getParameters(), function ($x) {
-        return $x->name == 'db';
+    $is_db = count(array_filter($controller_method->getParameters(), function ($i) {
+        return $i->name == 'db';
     }));
 
-    if ($is_need_db) {
+    if ($is_db) {
         $db = new App\Utils\Database();
-        $method->invoke(null, $db, $request);
+
+        //в production убрать
+        App\Utils\DatabaseSeeder::createTables($db);
+        //
+
+        exit($controller_method->invoke(null, $db, new App\Utils\Request()));
     } else {
-        $method->invoke(null, $request);
+        exit($controller_method->invoke(null, new App\Utils\Request()));
     }
 } else {
     throw new Exception('Route not found', 404);
 }
-
-
-//uncomment if you need to create tables
-//App\Utils\DatabaseSeeder::createTables($db);

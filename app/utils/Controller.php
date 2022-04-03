@@ -2,6 +2,6 @@
 
 namespace App\Utils;
 
-class Controller {
+abstract class Controller {
 
 }
