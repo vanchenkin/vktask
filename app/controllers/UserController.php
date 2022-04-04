@@ -38,19 +38,19 @@ class UserController
         if (!$review_id) {
             return Response::json([
                 'message' => 'Should provide review id'
-            ], 404);
+            ], 400);
         }
 
         if ($type !== 'PLUS' && $type !== 'MINUS') {
             return Response::json([
                 'message' => 'Type should be PLUS or MINUS'
-            ], 404);
+            ], 400);
         }
 
         if (!$user_id) {
             return Response::json([
                 'message' => 'Should be authorized(provide user id)'
-            ], 404);
+            ], 400);
         }
 
         $review = Review::get($db, $review_id);

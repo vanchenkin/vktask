@@ -6,12 +6,12 @@ use App\Utils\Response;
 use App\Utils\Request;
 use App\Utils\Database;
 use App\Models\Review;
+use App\Models\User;
 
 class ReviewController
 {
     public static function create(Database $db, Request $request)
     {
-        //TODO check unique review
         $phone = $request->phone;
         $text = $request->text;
         $user_id = $request->user_id;
@@ -20,6 +20,15 @@ class ReviewController
             return Response::json([
                 'message' => 'Empty phone or wrong format'
             ], 400);
+        }
+
+        if ($user_id) {
+            $user = User::get($db, $user_id);
+            if (!$user) {
+                return Response::json([
+                    'message' => 'User not found'
+                ], 404);
+            }
         }
 
         Review::create($db, [
@@ -43,7 +52,7 @@ class ReviewController
             ], 400);
         }
 
-        $reviews = Review::filter($db, ['phone' => $phone]);
+        $reviews = Review::getByPhone($db, $phone);
 
         return Response::json([
             'message' => 'Success',

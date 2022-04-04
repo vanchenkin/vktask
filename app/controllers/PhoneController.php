@@ -41,8 +41,9 @@ class PhoneController
         }
 
         return Response::json([
-            'country' => $country
-        ]);
+            'message' => 'Success',
+            'content' => $country,
+        ], 200);
     }
 
     public static function search(Database $db, Request $request)
@@ -55,9 +56,7 @@ class PhoneController
             ], 400);
         }
 
-        $reviews = Review::search($db, [
-            'phone' => $phone,
-        ]);
+        $reviews = Review::search($db, $phone);
 
         return Response::json([
             'message' => 'Success',

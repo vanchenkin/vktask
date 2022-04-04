@@ -51,7 +51,14 @@ class Review extends Model
         return $review;
     }
 
-    public static function filter(Database $db, array $params)
+    /**
+     * Returns reviews for input phone with rating and user name
+     *
+     * @param Database $db
+     * @param string $phone
+     * @return object
+     */
+    public static function getByPhone(Database $db, string $phone)
     {
         return $db->query("
             SELECT
@@ -78,10 +85,18 @@ class Review extends Model
             GROUP BY
                 reviews.id
             ;
-        ", $params);
+        ", ['phone' => $phone]);
     }
 
-    public static function search(Database $db, array $params)
+    /**
+     * Search reviews where phone starts with input string
+     * Additionally returns count of reviews for this phones
+     *
+     * @param Database $db
+     * @param string $phone
+     * @return object
+     */
+    public static function search(Database $db, string $phone)
     {
         return $db->query("
             SELECT DISTINCT
@@ -95,9 +110,17 @@ class Review extends Model
             GROUP BY
                 phone
             ;
-        ", $params);
+        ", ['phone' => $phone]);
     }
 
+    /**
+     * Rate review
+     *
+     * @param Database $db
+     * @param User $user
+     * @param string $type
+     * @return boolean
+     */
     public function rate(Database $db, User $user, string $type)
     {
         return $db->execute("
