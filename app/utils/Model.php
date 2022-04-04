@@ -8,8 +8,9 @@ abstract class Model
 
     public function __get($param)
     {
-        if ($param == 'id')
+        if ($param == 'id') {
             return $this->id;
+        }
         return null;
     }
 }

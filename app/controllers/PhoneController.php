@@ -27,15 +27,18 @@ class PhoneController
     {
         $phone = $request->phone;
 
-        if (!$phone || !self::validatePhone($phone))
+        if (!$phone || !self::validatePhone($phone)) {
             return Response::json([
                 'message' => 'Empty phone or wrong format'
             ], 400);
+        }
 
         $country = "RU(Россия)";
-        foreach (self::$COUNTRY_CODES as $code => $code_country)
-            if (str_starts_with($phone, $code))
+        foreach (self::$COUNTRY_CODES as $code => $code_country) {
+            if (substr($phone, 0, strlen($code)) === $code) {
                 $country = $code_country;
+            }
+        }
 
         return Response::json([
             'country' => $country
@@ -46,10 +49,11 @@ class PhoneController
     {
         $phone = $request->phone;
 
-        if (!$phone || !self::validatePhone($phone))
+        if (!$phone || !self::validatePhone($phone)) {
             return Response::json([
                 'message' => 'Empty phone or wrong format'
             ], 400);
+        }
 
         $reviews = Review::search($db, [
             'phone' => $phone,

@@ -16,10 +16,11 @@ class ReviewController
         $text = $request->text;
         $user_id = $request->user_id;
 
-        if (!$phone || !$text || !PhoneController::validatePhone($phone))
+        if (!$phone || !$text || !PhoneController::validatePhone($phone)) {
             return Response::json([
                 'message' => 'Empty phone or wrong format'
             ], 400);
+        }
 
         Review::create($db, [
             'phone' => $phone,
@@ -36,10 +37,11 @@ class ReviewController
     {
         $phone = $request->phone;
 
-        if (!$phone || !PhoneController::validatePhone($phone))
+        if (!$phone || !PhoneController::validatePhone($phone)) {
             return Response::json([
                 'message' => 'Empty phone or wrong format'
             ], 400);
+        }
 
         $reviews = Review::filter($db, ['phone' => $phone]);
 
