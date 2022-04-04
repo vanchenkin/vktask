@@ -23,6 +23,4 @@
 
 ## Запуск
 
-`composer install`
-
 `php -S host:port`
