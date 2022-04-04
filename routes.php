@@ -73,6 +73,7 @@ $postRoutes = [
 
     /**
      * Rate review
+     * Creates or updates rate review record
      *
      * @param review_id int
      * @param type enum(PLUS, MINUS)
