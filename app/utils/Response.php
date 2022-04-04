@@ -4,13 +4,6 @@ namespace App\Utils;
 
 class Response
 {
-    /**
-     * Возвращает json ответ из массива
-     *
-     * @param array $array
-     * @param integer $code
-     * @return string
-     */
     public static function json(array $array, int $code = 200)
     {
         http_response_code($code);

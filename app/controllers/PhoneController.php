@@ -2,12 +2,12 @@
 
 namespace App\Controllers;
 
-use App\Utils\Controller;
 use App\Utils\Response;
 use App\Utils\Request;
 use App\Utils\Database;
+use App\Models\Review;
 
-class PhoneController extends Controller
+class PhoneController
 {
     public static $COUNTRY_CODES = [
         '+7' => 'RU(Россия)',
@@ -44,6 +44,20 @@ class PhoneController extends Controller
 
     public static function search(Database $db, Request $request)
     {
-        echo 123;
+        $phone = $request->phone;
+
+        if (!$phone || !self::validatePhone($phone))
+            return Response::json([
+                'message' => 'Empty phone or wrong format'
+            ], 400);
+
+        $reviews = Review::search($db, [
+            'phone' => $phone,
+        ]);
+
+        return Response::json([
+            'message' => 'Success',
+            'content' => $reviews,
+        ], 200);
     }
 }
